@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const UserControllerr = require('../controllers/user_controller');
-
+console.log("jfj");
 router.post('/addUser', (req, res) => {
     UserControllerr.addUser(req, res)
 });
@@ -17,6 +17,6 @@ router.delete('/deleteUser/:id', (req, res) => {
 });
 
 router.all('*', (req, res) => {
-    res.status(err.status).send('The rout isnt avileble..')
+    res.status(err.status).send("The rout isn't avilable..")
 })
 module.exports = router;
