@@ -8,6 +8,7 @@ const roomRoute = require('./app/routes/room_routes.js');
 const taskRoute = require('./app/routes/task_routes.js');
 const userRoute = require('./app/routes/user_routes.js');
 const deviceRoute = require('./app/routes/device_routes.js');
+const locationRoute = require('./app/routes/location_route');
 
 
 app.use(express.json());
@@ -18,6 +19,7 @@ app.use('', roomRoute);
 app.use('', taskRoute);
 app.use('', userRoute);
 app.use('', deviceRoute);
+app.use('', locationRoute);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
