@@ -2,32 +2,26 @@
 const mongoose = require('mongoose');
 const User = require('../models/user');
 const moment = require('moment');
+var Enum = require('enum');
+var Distance = require('geo-distance');
+//const validatePhoneNumber = require('validate-phone-number-node-js');
 
-const updateUserRating = async (req, res) => {
+
+const deleteUser = async (req, res) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) throw {
-            status: httpStatus.BAD_REQUEST, message: 'Invalid id number'
+            status: httpStatus.BAD_REQUEST, message: 'Invalid task id number'
         }
-        if (typeof req.body.rate != 'number') throw {
-            status: httpStatus.BAD_REQUEST, message: 'Must include rate'
-        }
-        obj = await User.find({ _id: req.params.id }, (err) => {
-            if (err)
-                throw { status: httpStatus.INTERNAL_SERVER_ERROR, message: err }
-        });
+        obj = await User.find({ _id: req.params.id }, (err) => { if (err) throw err });
         if (obj.length == 0) throw {
-            status: httpStatus.BAD_REQUEST, message: 'No such movie'
+            status: httpStatus.BAD_REQUEST, message: 'No such task'
         }
-        obj = obj[0];
-        if (req.body.rate) {
-
-            obj.rate = req.body.rate;
-        }
-        await User.updateOne({ _id: req.params.id }, obj);
-        res.status(httpStatus.OK).send('User was updated')
+        await User.deleteOne({ _id: req.params.id });
+        res.status(httpStatus.OK).send('user was deleted')
     } catch (err) {
         res.status(err.status).send(err.message);
     }
+
 };
 
 const viewAllUsers = async (req, res) => {
@@ -37,7 +31,7 @@ const viewAllUsers = async (req, res) => {
                 throw { status: httpStatus.INTERNAL_SERVER_ERROR, message: err }
         });
         if (obj.length == 0) throw {
-            status: httpStatus.BAD_REQUEST, message: 'No such movie'
+            status: httpStatus.BAD_REQUEST, message: 'No users'
         }
         res.status(httpStatus.OK).json(obj);
     } catch (err) {
@@ -51,68 +45,115 @@ const viewSingleUser = async (req, res) => {
         }
         obj = await User.find({ _id: req.params.id }, (err) => { if (err) throw err });
         if (obj.length == 0) throw {
-            status: httpStatus.BAD_REQUEST, message: 'No such movie'
+            status: httpStatus.BAD_REQUEST, message: 'No such user'
         }
         res.status(httpStatus.OK).json(obj[0]);
     } catch (err) {
         res.status(err.status).send(err.message);
     }
 };
-const deleteUser = async (req, res) => {
-    try {
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) throw {
-            status: httpStatus.BAD_REQUEST, message: 'Invalid id number'
-        }
-        obj = await User.find({ _id: req.params.id }, (err) => { if (err) throw err });
-        if (obj.length == 0) throw {
-            status: httpStatus.BAD_REQUEST, message: 'No such movie'
-        }
-        await User.deeOne({ _id: req.params.id });
-        res.status(httpStatus.OK).send('User was deed')
-    } catch (err) {
-        res.status(err.status).send(err.message);
-    }
-};
-const addReview=async(req, res)=> {
-    try {
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) throw {
-            status: httpStatus.BAD_REQUEST, message: 'Invalid id number'
-        }
-        if (!req.body.review) throw { status: httpStatus.BAD_REQUEST, message: 'invalid variables' };
 
-        User.updateOne({ _id: req.params.id }, { $push: { reviews: req.body.review } }, function (err, result) {
-            if (err) {
-                throw { status: httpStatus.INTERNAL_SERVER_ERROR, message: err }
-            }
-            res.status(httpStatus.OK).send(`Inserted review "${req.body.review}" to movie id ${req.params.id}`);
-        });
 
-    } catch (err) {
-        res.status(err.status).send(err.message);
-    }
-}
-const addUser= async(req, res)=> {
+const addUser = async (req, res) => {
     try {
-        if (!req.body.name || !req.body.rate || req.body.rate < 0 || req.body.rate > 5) throw { status: httpStatus.BAD_REQUEST, message: 'invalid variables' };
-        obj = User({
+       // if(!validatePhoneNumber.validate(JSON.stringify(req.body.PhoneNumber)) throw { status: httpStatus.BAD_REQUEST, message: 'Phone number is incorrect' };
+        var url=req.body.imageURL
+        var spec=req.body.speciality
+        var resID_forManagers=req.body.resturantID
+
+        if(!url)
+        {
+
+            url="https://www.diplomacy.edu/sites/all/themes/jollyany/demos/no-avatar.jpg"
+
+        }
+        if(!spec)
+        {
+            spec="General"
+
+        }
+
+        if(!resID_forManagers)
+        {
+            restID=null;
+
+        }
+        console.log(req.body.Role)
+
+        Obj = User({
             name: req.body.name,
-            reviews: req.body.reviews || [],
-            date: moment().format("DD-MM-YYYY"),
-            rate: req.body.rate
+            email: req.body.email,
+            password: req.body.password,
+            PhoneNumber:req.body.PhoneNumber,
+            imageURL: url,
+            lat:Number,
+            Lon:Number,
+            Role: req.body.Role, //Shouldn't validate- client side will send at least one role
+            DetailsTech:{//when opened, Tech rating will be set to 3 as a deafult value as set in the schema
+                speciality: spec
+             },
+            DetailsManager:restID
+
         });
-        await obj.save();
-        res.status(httpStatus.OK).send(`Inserted review with id ${obj._id}`);
+        await Obj.save();
+        console.log(Obj.Role)
+        res.status(httpStatus.OK).send("new user was created")
+    }
+    catch (err) {
+        if (err.code == 11000)
+        res.status(400).send({message : "mail is already in use"})
+        else return { message: "unkown error" };
+
+    }
+}
+
+const GetAllAvailibleTech = async (req, res) =>
+{//Recieves Resturant position from client side within the req
+    try {
+        obj = await User.find({}, (err) => {
+            if (err)
+                throw { status: httpStatus.INTERNAL_SERVER_ERROR, message: err }
+        }).where('Role').equals('Technician').where('statusOn').equals('true'); 
+         
+        res.status(httpStatus.OK).json(obj);
     } catch (err) {
         res.status(err.status).send(err.message);
     }
 }
 
+const updateStatus = async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) throw {
+            status: httpStatus.BAD_REQUEST, message: 'Invalid id number'
+        }
+       
+        obj = await User.find({ _id: req.params.id }, (err) => {
+            if (err)
+                throw { status: httpStatus.INTERNAL_SERVER_ERROR, message: err }
+        });
+        if (obj.length == 0) throw {
+            status: httpStatus.BAD_REQUEST, message: 'No such user'
+        }
+        obj = obj[0];
+        if(obj.statusOn==false)
+        {
+            obj.statusOn=true;
+        }
+         else{
+            obj.statusOn=false;
 
-module.exports = {
-    addUser,
-    addReview,
-    deleteUser,
-    viewSingleUser,
-    viewAllUsers,
-    updateUserRating,    
+        }
+        await User.updateOne({ _id: req.params.id }, obj);
+        res.status(httpStatus.OK).send('User status was updated')
+    } catch (err) {
+        res.status(err.status).send(err.message);
+    }
 };
+    module.exports = {
+        addUser,
+        deleteUser,
+        viewSingleUser,
+        viewAllUsers,
+        GetAllAvailibleTech,
+        updateStatus,
+    };

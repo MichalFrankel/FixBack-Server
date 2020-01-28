@@ -16,7 +16,7 @@ router.delete('/deleteRoom/:id', (req, res) => {
     roomController.deleteRoom(req, res)
 });
 
-router.all('*', (req, res) => {
-    res.status(err.status).send('The rout isnt avileble..')
-})
+// router.all('*', (req, res) => {
+//     res.status(err.status).send('The rout isnt avileble..')
+// })
 module.exports = router;

@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
-var device= require('./device.js');
+var Device= require('./device.js');
 const RoomSchema = mongoose.Schema({
-    Name: String,
-    Device:{
+    name: {
+        type:String,
+        require:true,
+    },
+    device:{
         type:[mongoose.Schema.Types.ObjectId],
         ref: 'device'
     },

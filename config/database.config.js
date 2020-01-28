@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { DB_USER, DB_PASS, DB_HOST } = require('./constants');
 const url = `mongodb+srv://${DB_USER}:${DB_PASS}@${DB_HOST}`;
+console.log(url)
 const options = {
     useCreateIndex: true,
     useNewUrlParser: true,

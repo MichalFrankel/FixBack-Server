@@ -3,7 +3,14 @@ var room=require('./room.js')
 var tasks=require('./task.js')
 
 const ResturantSchema = mongoose.Schema({
-    Address: String,
+    name:String,
+    position:{
+        address:String,
+        location:{
+            type:[mongoose.Schema.Types.ObjectId],
+            ref:'location',
+        }
+    },
     Rooms:{
         type:[mongoose.Schema.Types.ObjectId],
         ref: 'room'

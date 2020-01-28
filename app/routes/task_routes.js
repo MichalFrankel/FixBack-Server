@@ -1,22 +1,28 @@
 const router = require('express').Router();
-const TaskControllerr = require('../controllers/task_controller');
+const TaskController = require('../controllers/task_controller');
 
-router.post('/addTask', (req, res) => {
-    TaskControllerr.addTask(req, res)
+router.post('/createNewTask', (req, res) => {
+    TaskController.addTask(req, res)
 });
 
-router.get('/viewAllTasks', (req, res) => {
-    TaskControllerr.viewAllTasks(req, res)
+router.get('/viewAllTasks/:userId/:date/:status', (req,res) => {
+    TaskController.viewAllTasks(req, res)
 });
 
 router.get('/viewSingleTask/:id', (req, res) => {
-    TaskControllerr.viewSingleTask(req, res)
+    TaskController.viewSingleTask(req, res)
 });
 router.delete('/deleteTask/:id', (req, res) => {
-    TaskControllerr.deleteTask(req, res)
+    TaskController.deleteTask(req, res)
+});
+router.put('/updateTask/:taskId', (req, res) => {
+    TaskController.updateTask(req, res)
+});
+router.get('/allLogs', (req, res) => {
+    TaskController.allLogs(req, res)
 });
 
-router.all('*', (req, res) => {
-    res.status(err.status).send('The rout isnt avileble..')
-})
+// router.all('*', (req, res) => {
+//     res.status(err.status).send('The rout isnt avileble..')
+// })
 module.exports = router;

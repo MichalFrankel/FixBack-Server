@@ -1,22 +1,29 @@
 const router = require('express').Router();
-const UserControllerr = require('../controllers/user_controller');
-console.log("jfj");
+const UserController = require('../controllers/user_controller');
 router.post('/addUser', (req, res) => {
-    UserControllerr.addUser(req, res)
+    UserController.addUser(req, res)
 });
 
 router.get('/viewAllUsers', (req, res) => {
-    UserControllerr.viewAllUsers(req, res)
+    UserController.viewAllUsers(req, res)
 });
 
 router.get('/viewSingleUser/:id', (req, res) => {
-    UserControllerr.viewSingleUser(req, res)
+    UserController.viewSingleUser(req, res)
 });
 router.delete('/deleteUser/:id', (req, res) => {
-    UserControllerr.deleteUser(req, res)
+    UserController.deleteUser(req, res)
 });
 
-router.all('*', (req, res) => {
-    res.status(err.status).send("The rout isn't avilable..")
-})
+
+router.get('/GetAllAvailibleTech', (req, res) => {
+    UserController.GetAllAvailibleTech(req, res)
+});
+
+router.put('/UpdateStatus/:id', (req,res) => {
+    UserController.updateStatus(req,res)
+});
+// router.all('*', (req, res) => {
+//     res.status(err.status).send("The rout isn't avilable..")
+// })
 module.exports = router;

@@ -1,7 +1,11 @@
+
 const mongoose = require('mongoose');
 
-const UserSchema = mongoose.Schema({
-    name: String,
+const User = mongoose.Schema({
+    name:{
+    type: String,
+    require:[true,"Name required"]
+    },
     email: {
         type: String,
         require:[true, 'Email Required'],
@@ -10,31 +14,50 @@ const UserSchema = mongoose.Schema({
     password:{
         type: String,
         require:[true, 'Password Required'],
-        validate:{
-            validator: function(v){
-                return v.length >= 6;
-            },
-            message:'Password should contain at least 6 characters'
-        }
+        
     },
-    PhoneNumber: String,
-    imageURL: String,
+    statusOn:{
+        type: Boolean,
+        default:false
+},
+    position:
+    {
+        lat:Number,
+        default:0,
+        lon:Number,
+        default:0,
+        
+    },
+   
+    PhoneNumber:{
+        type: String,
+        require:[true,'Phone number Required'],
+    },
+    imageURL:{ 
+        type:String,
+    },
+
     Role:{
         type: String,
-        enum: ['Resturant Manager','Manager','Technician']
+        enum: ['Resturant Manager','Manager','Technician'],
+        require: [true],
     },
     DetailsTech:{
-        systemRating: String,
+        systemRating: {
+            type:Number,
+            default: 3.0
+        },
         speciality:{
             type: String,
-            enum: ['AC','Electrician','Big Appliances','General']
-        }
-    },
+            enum: ['AC','Electrician','Big Appliances','General'],
+        },
+
+  
 
     DetailsManager:{
         type:[mongoose.Schema.Types.ObjectId],
         ref: 'resturant'
     }
-}, {
+}, 
 });
-module.exports = mongoose.model('UserSchema', UserSchema);
+module.exports = mongoose.model('users', User);
