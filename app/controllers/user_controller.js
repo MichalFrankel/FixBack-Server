@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const moment = require('moment');
 var Enum = require('enum');
-var Distance = require('geo-distance');
 //const validatePhoneNumber = require('validate-phone-number-node-js');
 
 
@@ -56,10 +55,11 @@ const viewSingleUser = async (req, res) => {
 
 const addUser = async (req, res) => {
     try {
-       // if(!validatePhoneNumber.validate(JSON.stringify(req.body.PhoneNumber)) throw { status: httpStatus.BAD_REQUEST, message: 'Phone number is incorrect' };
+        if (!req.body.name) throw { status: httpStatus.BAD_REQUEST, message: 'name is required' };
         var url=req.body.imageURL
         var spec=req.body.speciality
         var resID_forManagers=req.body.resturantID
+        console.log(req.body.email)
 
         if(!url)
         {
@@ -78,7 +78,6 @@ const addUser = async (req, res) => {
             restID=null;
 
         }
-        console.log(req.body.Role)
 
         Obj = User({
             name: req.body.name,

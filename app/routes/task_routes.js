@@ -5,7 +5,7 @@ router.post('/createNewTask', (req, res) => {
     TaskController.addTask(req, res)
 });
 
-router.get('/viewAllTasks/:userId/:date/:status', (req,res) => {
+router.get('/viewAllTasks/:userId/:date/:status/:resturant', (req,res) => {
     TaskController.viewAllTasks(req, res)
 });
 

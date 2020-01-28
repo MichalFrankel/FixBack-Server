@@ -8,6 +8,16 @@ const DeviceSchema = mongoose.Schema({
     GTIN:{
     type: String,
     require:true,
+    },
+
+    TechType: {
+        type: String,
+        enum: ['AC','Electrician','Big Appliances','General'],
+        require:true
+    },
+    room:{
+        type:[mongoose.Schema.Types.ObjectId],
+        ref: 'room'
     }
 });
 

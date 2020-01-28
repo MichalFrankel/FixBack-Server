@@ -69,21 +69,25 @@ const updateTask = async (req, res) => {
 }
 const viewAllTasks = async (req, res) => {
     try {
-        if (!mongoose.Types.ObjectId.isValid(req.params.userId)) throw {//User id
-            status: httpStatus.BAD_REQUEST, message: 'Invalid id number'
+        if (!mongoose.Types.ObjectId.isValid(req.params.userId)) throw {//User id who opened the tasks
+            status: httpStatus.BAD_REQUEST, message: 'Invalid user id number'
+        }
+        if (!mongoose.Types.ObjectId.isValid(req.params.resturant)) throw {//tasks within the resturant
+            status: httpStatus.BAD_REQUEST, message: 'Invalid resturant id number'
         }
         userObj = await User.find({ _id: req.params.userId }, (err) => { if (err) throw err });
         if (userObj.length == 0) throw {
-            status: httpStatus.BAD_REQUEST, message: 'No such task'
+            status: httpStatus.BAD_REQUEST, message: 'No such tasks'
         }
+        if(!req.params.resturant) throw { status: httpStatus.BAD_REQUEST, message: 'resturant id can not be empty'
+    }
         if (userObj[0].Role == 'Resturant Manager') {
             taskObj = await Task.find({}, (err) => {
                 if (err) throw { status: httpStatus.INTERNAL_SERVER_ERROR }
-            }).where('StatusManager').equals(req.params.status);
+            }).where('StatusManager').equals(req.params.status).where('Resturant').equals(req.params.resturant);
             if (taskObj.length == 0) throw {
                 status: httpStatus.BAD_REQUEST, message: `There is no task from type ${req.params.status}`
             }
-            console.log("task object: :", taskObj[0]);
             res.status(httpStatus.OK).send(JSON.stringify(taskObj));
         }
         else if (userObj[0].Role == 'Technician') {
@@ -151,6 +155,10 @@ const addTask = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(req.body.resturantId)) throw {
             status: httpStatus.BAD_REQUEST, message: 'Invalid resturant id number'
         }
+
+        if (!mongoose.Types.ObjectId.isValid(req.body.deviceId)) throw {
+            status: httpStatus.BAD_REQUEST, message: 'Invalid device id number'
+        }
         if (!req.body.userId) throw { status: httpStatus.BAD_REQUEST, message: 'Invalid User Id' };
         if (!req.body.resturantId) throw { status: httpStatus.BAD_REQUEST, message: 'Invalid Resturant Id' };
         obj_ = await User.find({ _id: req.body.userId }, (err) => { if (err) throw err });
@@ -172,8 +180,10 @@ const addTask = async (req, res) => {
             OpenedAtTime: moment().format("YYYY-MM-DD HH:mm:ss"),
             FixNow: false,
             Resturant: req.body.resturantId,
+            device: req.body.deviceId,
             Type: type,
-            Urgency: urg
+            Urgency: urg,
+
         });
         await obj.save();
         logger.log(`New Task Was Created by ${obj_[0].name}!`);

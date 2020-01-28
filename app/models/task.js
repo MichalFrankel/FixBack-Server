@@ -25,10 +25,14 @@ const TaskSchema = mongoose.Schema({
         ref: 'resturant',
         require: true
     },
-    Type: {
-        type: String,
-        enum: ['AC', 'Electrician', 'Big Appliances', 'General']
+
+    device:{
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'device',
+        require: true
     },
+
+
     OpenedBy: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'user',

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 var room=require('./room.js')
-var tasks=require('./task.js')
 
 const ResturantSchema = mongoose.Schema({
     name:String,
@@ -10,10 +9,6 @@ const ResturantSchema = mongoose.Schema({
             type:[mongoose.Schema.Types.ObjectId],
             ref:'location',
         }
-    },
-    Rooms:{
-        type:[mongoose.Schema.Types.ObjectId],
-        ref: 'room'
     },
 });
 
